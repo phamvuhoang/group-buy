@@ -1,0 +1,28 @@
+{
+  "app": {
+    "title": "Mua Chung Việt Nam",
+    "subtitle": "Nguyên mẫu với Next.js + Tailwind"
+  },
+  "cta": {
+    "enter": "Vào ứng dụng"
+  },
+  "home": {
+    "groupDeals": "Ưu đãi Mua chung",
+    "tagline": "Rủ bạn bè để tiết kiệm hơn"
+  },
+  "product": {
+    "activeGroup": "Nhóm đang hoạt động",
+    "noActiveGroup": "Chưa có nhóm, hãy tạo đầu tiên!",
+    "join": "Tham gia nhóm",
+    "create": "Tạo nhóm",
+    "buySingle": "Mua lẻ"
+  },
+  "profile": {
+    "title": "Hồ sơ"
+  },
+  "checkout": {
+    "title": "Thanh toán",
+    "payNow": "Thanh toán ngay"
+  }
+}
+

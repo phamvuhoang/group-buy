@@ -1,0 +1,28 @@
+{
+  "app": {
+    "title": "Vietnam Group Buy",
+    "subtitle": "Prototype built with Next.js + Tailwind"
+  },
+  "cta": {
+    "enter": "Enter app"
+  },
+  "home": {
+    "groupDeals": "Group Deals",
+    "tagline": "Join with friends to save more"
+  },
+  "product": {
+    "activeGroup": "Active group",
+    "noActiveGroup": "No active groups. Be the first!",
+    "join": "Join group",
+    "create": "Create group",
+    "buySingle": "Buy single"
+  },
+  "profile": {
+    "title": "Profile"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "payNow": "Pay now"
+  }
+}
+
