@@ -36,7 +36,7 @@ export default function RealtimeGroupDetails({ groupId, productTitle }: Realtime
         // Success - realtime will update the actual count
         setTimeout(() => setOptimisticCount(undefined), 1000);
       }
-    } catch (error) {
+    } catch {
       setOptimisticCount(undefined);
       alert("Network error. Please try again.");
     } finally {

@@ -17,7 +17,6 @@ export default function ProductClient({ productId, showSinglePurchase = false }:
   const [isJoining, setIsJoining] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [isBuying, setIsBuying] = useState(false);
-  const [optimisticCount, setOptimisticCount] = useState<number | undefined>();
 
   const active = groups.find((g: Group) => g.product_id === productId && g.status === "open");
 
@@ -25,23 +24,16 @@ export default function ProductClient({ productId, showSinglePurchase = false }:
     if (!active || isJoining) return;
 
     setIsJoining(true);
-    // Optimistic update
-    setOptimisticCount(active.current_count + 1);
 
     try {
       const res = await fetch(`/api/groups/${active.id}/join`, { method: "POST" });
       const json = await res.json();
 
       if (!res.ok) {
-        // Revert optimistic update on error
-        setOptimisticCount(undefined);
         alert(json.error || "Failed to join group");
-      } else {
-        // Success - realtime will update the actual count
-        setTimeout(() => setOptimisticCount(undefined), 1000);
       }
-    } catch (error) {
-      setOptimisticCount(undefined);
+      // Success - realtime will update the actual count
+    } catch {
       alert("Network error. Please try again.");
     } finally {
       setIsJoining(false);
@@ -67,7 +59,7 @@ export default function ProductClient({ productId, showSinglePurchase = false }:
         alert(json.error || "Failed to create group");
       }
       // Success - realtime will add the new group
-    } catch (error) {
+    } catch {
       alert("Network error. Please try again.");
     } finally {
       setIsCreating(false);
@@ -83,7 +75,7 @@ export default function ProductClient({ productId, showSinglePurchase = false }:
       // Get product details for pricing
       const productRes = await fetch(`/api/products`);
       const products = await productRes.json();
-      const product = products.find((p: any) => p.id === productId);
+      const product = products.find((p: { id: string; price: number }) => p.id === productId);
 
       if (!product) {
         alert("Product not found");
@@ -106,7 +98,7 @@ export default function ProductClient({ productId, showSinglePurchase = false }:
       } else {
         alert(`Order created! Order ID: ${json.order.id}`);
       }
-    } catch (error) {
+    } catch {
       alert("Network error. Please try again.");
     } finally {
       setIsBuying(false);

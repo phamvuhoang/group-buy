@@ -1,10 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getTranslations } from "next-intl/server";
 import OrdersClient from "./page.client";
 
-export default async function OrdersPage() {
-  const t = await getTranslations();
-  
+export default function OrdersPage() {
   return (
     <div className="flex flex-col gap-4">
       <Card>
