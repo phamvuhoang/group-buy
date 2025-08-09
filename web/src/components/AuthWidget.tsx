@@ -2,8 +2,10 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
+import type { Session } from "@supabase/supabase-js";
+
 export default function AuthWidget() {
-  const [session, setSession] = useState<any>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
@@ -16,8 +18,9 @@ export default function AuthWidget() {
       const { data, error } = await supabase.auth.getSession();
       if (error) throw error;
       setSession(data.session || null);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      const err = e as Error;
+      setError(err.message);
     }
   }
 
@@ -36,8 +39,9 @@ export default function AuthWidget() {
       const { error } = await supabase.auth.signInWithOtp({ email });
       if (error) throw error;
       setOtpSent(true);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      const err = e as Error;
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -50,8 +54,9 @@ export default function AuthWidget() {
       const { data, error } = await supabase.auth.verifyOtp({ email, token: otp, type: "email" });
       if (error) throw error;
       setSession(data.session || null);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      const err = e as Error;
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -66,8 +71,9 @@ export default function AuthWidget() {
       setSession(null);
       setOtp("");
       setOtpSent(false);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      const err = e as Error;
+      setError(err.message);
     } finally {
       setLoading(false);
     }

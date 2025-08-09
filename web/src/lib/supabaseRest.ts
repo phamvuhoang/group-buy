@@ -12,7 +12,7 @@ function getHeaders() {
   } as Record<string, string>;
 }
 
-export async function sbSelectAll<T = any>(table: string, query: string = "*"): Promise<T[]> {
+export async function sbSelectAll<T = unknown>(table: string, query: string = "*"): Promise<T[]> {
   const headers = getHeaders();
   const url = `${SUPABASE_URL}/rest/v1/${table}?select=${encodeURIComponent(query)}`;
   const res = await fetch(url, { headers, cache: "no-store" });
@@ -23,7 +23,7 @@ export async function sbSelectAll<T = any>(table: string, query: string = "*"): 
   return res.json();
 }
 
-export async function sbInsert<T = any>(table: string, rows: any | any[]): Promise<T[]> {
+export async function sbInsert<T = unknown>(table: string, rows: unknown | unknown[]): Promise<T[]> {
   const headers = getHeaders();
   const url = `${SUPABASE_URL}/rest/v1/${table}`;
   const res = await fetch(url, { method: "POST", headers: { ...headers, Prefer: "return=representation" }, body: JSON.stringify(rows) });
@@ -36,7 +36,7 @@ export async function sbInsert<T = any>(table: string, rows: any | any[]): Promi
 
 
 
-export async function sbSelectWhere<T = any>(
+export async function sbSelectWhere<T = unknown>(
   table: string,
   where: Record<string, string | number | boolean>,
   select: string = "*"
@@ -55,7 +55,7 @@ export async function sbSelectWhere<T = any>(
   return res.json();
 }
 
-export async function sbSelectOne<T = any>(
+export async function sbSelectOne<T = unknown>(
   table: string,
   where: Record<string, string | number | boolean>,
   select: string = "*"

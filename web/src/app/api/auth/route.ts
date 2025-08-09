@@ -29,8 +29,9 @@ export async function POST(req: NextRequest) {
       return Response.json({ ok: true })
     }
     return new Response(JSON.stringify({ error: 'Invalid request' }), { status: 400 })
-  } catch (e: any) {
-    return new Response(JSON.stringify({ error: e.message || 'Auth error' }), { status: 500 })
+  } catch (e) {
+    const err = e as Error
+    return new Response(JSON.stringify({ error: err.message || 'Auth error' }), { status: 500 })
   }
 }
 

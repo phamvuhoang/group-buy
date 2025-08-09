@@ -4,8 +4,9 @@ export async function GET() {
   try {
     const items = await sbSelectAll("groups");
     return Response.json(items);
-  } catch (e: any) {
-    return new Response(JSON.stringify({ error: e.message || "Supabase error" }), { status: 500 });
+  } catch (e) {
+    const err = e as Error;
+    return new Response(JSON.stringify({ error: err.message || "Supabase error" }), { status: 500 });
   }
 }
 

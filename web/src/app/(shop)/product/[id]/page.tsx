@@ -9,9 +9,10 @@ import ProductClient from "./page.client";
 import { sbSelectOne, sbSelectWhere } from "@/lib/supabaseRest";
 import type { Product, Group } from "@/lib/types";
 
-export default async function ProductDetail({ params }: { params: { id: string } }) {
+export default async function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
   const t = await getTranslations();
-  const product = await sbSelectOne<Product>("products", { id: params.id });
+  const { id } = await params;
+  const product = await sbSelectOne<Product>("products", { id });
   if (!product) return <div>Not found</div>;
 
   const groups = await sbSelectWhere<Group>("groups", { product_id: product.id, status: "open" });

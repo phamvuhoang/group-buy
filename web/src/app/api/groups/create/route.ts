@@ -1,7 +1,6 @@
-import { NextRequest } from "next/server";
 import { supabase } from "@/lib/supabaseClient";
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   const { product_id, required_count, expires_at } = await req.json();
 
   // 1) Ensure signed-in user
