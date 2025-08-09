@@ -15,7 +15,13 @@
     "noActiveGroup": "No active groups. Be the first!",
     "join": "Join group",
     "create": "Create group",
-    "buySingle": "Buy single"
+    "buySingle": "Buy single",
+    "joining": "Joining...",
+    "creating": "Creating...",
+    "groupCompleted": "Group Completed",
+    "participants": "Participants",
+    "status": "Status",
+    "groupId": "Group ID"
   },
   "profile": {
     "title": "Profile"

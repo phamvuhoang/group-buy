@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import HomeClient from "../page.client";
+import DealsClient from "./page.client";
 
 export default function DealsPage() {
   const t = useTranslations();
@@ -12,7 +12,7 @@ export default function DealsPage() {
         </div>
       </section>
 
-      <HomeClient />
+      <DealsClient />
     </div>
   );
 }

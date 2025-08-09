@@ -15,7 +15,13 @@
     "noActiveGroup": "Chưa có nhóm, hãy tạo đầu tiên!",
     "join": "Tham gia nhóm",
     "create": "Tạo nhóm",
-    "buySingle": "Mua lẻ"
+    "buySingle": "Mua lẻ",
+    "joining": "Đang tham gia...",
+    "creating": "Đang tạo...",
+    "groupCompleted": "Nhóm đã đủ",
+    "participants": "Thành viên",
+    "status": "Trạng thái",
+    "groupId": "Mã nhóm"
   },
   "profile": {
     "title": "Hồ sơ"

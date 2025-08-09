@@ -20,6 +20,7 @@ export default function ShopLayout({ children }: { children: ReactNode }) {
             <SheetContent side="right">
               <nav className="flex flex-col gap-2 mt-8">
                 <Link href="/deals" className="underline-offset-2 hover:underline">Deals</Link>
+                <Link href="/orders" className="underline-offset-2 hover:underline">Orders</Link>
                 <Link href="/profile" className="underline-offset-2 hover:underline">Profile</Link>
                 <Link href="/merchant" className="underline-offset-2 hover:underline">Merchant</Link>
                 <Link href="/admin" className="underline-offset-2 hover:underline">Admin</Link>

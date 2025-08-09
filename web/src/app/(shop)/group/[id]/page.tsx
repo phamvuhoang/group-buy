@@ -1,18 +1,13 @@
-import GroupProgress from "@/components/GroupProgress";
-import ShareButtons from "@/components/ShareButtons";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { sbSelectOne, sbSelectWhere } from "@/lib/supabaseRest";
+import { sbSelectOne } from "@/lib/supabaseRest";
 import type { Group, Product } from "@/lib/types";
-import GroupJoinClient from "./page.client";
-
-type GroupParticipant = { id: string; group_id: string; user_id: string };
+import RealtimeGroupDetails from "./realtime-group-details";
 
 export default async function GroupPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const group = await sbSelectOne<Group>("groups", { id });
   if (!group) return <div>Group not found</div>;
   const product = await sbSelectOne<Product>("products", { id: group.product_id });
-  const participants = await sbSelectWhere<GroupParticipant>("group_participants", { group_id: group.id });
 
   return (
     <div className="flex flex-col gap-3">
@@ -21,15 +16,9 @@ export default async function GroupPage({ params }: { params: Promise<{ id: stri
           <CardTitle className="text-lg">Group for {product?.title}</CardTitle>
         </CardHeader>
         <CardContent className="pt-4">
-          <GroupProgress current={group.current_count} required={group.required_count} expiresAt={group.expires_at} />
-          <div className="text-sm text-muted-foreground mt-3">Participants: {participants.length}</div>
+          <RealtimeGroupDetails groupId={group.id} productTitle={product?.title || "Unknown Product"} />
         </CardContent>
       </Card>
-
-      <div className="flex gap-2">
-        <GroupJoinClient groupId={group.id} />
-        <ShareButtons url={`https://example.com/group/${group.id}`} title={`Join group`} />
-      </div>
     </div>
   );
 }

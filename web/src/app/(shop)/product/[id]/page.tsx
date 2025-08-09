@@ -1,11 +1,9 @@
 import Image from "next/image";
-import GroupProgress from "@/components/GroupProgress";
-import ShareButtons from "@/components/ShareButtons";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { getTranslations } from "next-intl/server";
 import { formatCurrencyVND } from "@/lib/format";
-import ProductClient from "./page.client";
+import ProductRealtimeClient from "./page.client";
+import RealtimeGroup from "./realtime-group";
 import { sbSelectOne, sbSelectWhere } from "@/lib/supabaseRest";
 import type { Product, Group } from "@/lib/types";
 
@@ -37,27 +35,17 @@ export default async function ProductDetail({ params }: { params: Promise<{ id: 
       </Card>
 
       {activeGroup ? (
-        <Card>
-          <CardHeader className="flex-row items-center justify-between border-b pb-3">
-            <CardTitle className="text-sm">{t("product.activeGroup")}</CardTitle>
-            <ShareButtons url={`https://example.com/group/${activeGroup.id}`} title={`Join group for ${product.title}`} />
-          </CardHeader>
-          <CardContent className="pt-4">
-            <GroupProgress current={activeGroup.current_count} required={activeGroup.required_count} expiresAt={activeGroup.expires_at} />
-            <ProductClient productId={product.id} />
-            <div className="mt-2 text-xs text-muted-foreground">Group ID: {activeGroup?.id}</div>
-          </CardContent>
-        </Card>
+        <RealtimeGroup groupId={activeGroup.id} productTitle={product.title} />
       ) : (
         <Card>
           <CardContent className="pt-4">
             <span className="text-sm">{t("product.noActiveGroup")}</span>
-            <Button className="mt-3 w-full" variant="destructive">{t("product.create")}</Button>
+            <ProductRealtimeClient productId={product.id} />
           </CardContent>
         </Card>
       )}
 
-      <Button className="w-full" variant="secondary">{t("product.buySingle")}</Button>
+      <ProductRealtimeClient productId={product.id} showSinglePurchase={true} />
     </div>
   );
 }
