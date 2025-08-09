@@ -1,10 +1,15 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { Suspense } from "react";
+import AuthErrorHandler from "./auth-error-handler";
 
 export default async function Home() {
   const t = await getTranslations();
   return (
     <div className="min-h-screen grid place-items-center p-6">
+      <Suspense fallback={null}>
+        <AuthErrorHandler />
+      </Suspense>
       <div className="max-w-md w-full text-center">
         <h1 className="text-2xl font-bold mb-2">{t("app.title")}</h1>
         <p className="text-sm text-gray-600 mb-6">{t("app.subtitle")}</p>
