@@ -1,18 +1,28 @@
-import { supabase } from "@/lib/supabaseClient";
+import { createSupabaseServerClient } from "@/lib/supabaseServer";
 
 export async function POST(req: Request) {
   const { product_id, required_count, expires_at } = await req.json();
 
-  // 1) Ensure signed-in user
-  const { data: sess, error: sessErr } = await supabase.auth.getSession();
-  if (sessErr) return new Response(JSON.stringify({ error: sessErr.message }), { status: 500 });
-  const user = sess.session?.user;
+  // 1) Create server-side Supabase client
+  const supabase = await createSupabaseServerClient();
+
+  // 2) Ensure signed-in user
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) return new Response(JSON.stringify({ error: userError.message }), { status: 500 });
   if (!user) return new Response(JSON.stringify({ error: "Not authenticated" }), { status: 401 });
 
-  // 2) Create group with leader_id = current user
+  // 3) Create group with leader_id = current user
   const { data, error } = await supabase
     .from("groups")
-    .insert({ product_id, leader_id: user.id, required_count, expires_at, status: "open" })
+    .insert({
+      id: crypto.randomUUID(),
+      product_id,
+      leader_id: user.id,
+      required_count,
+      expires_at,
+      status: "open",
+      current_count: 0
+    })
     .select();
   if (error) return new Response(JSON.stringify({ error: error.message }), { status: 400 });
   return Response.json({ group: data?.[0] }, { status: 200 });

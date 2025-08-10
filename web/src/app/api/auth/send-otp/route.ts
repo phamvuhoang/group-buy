@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,7 +12,6 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Use Supabase REST API directly to force OTP
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
@@ -22,26 +22,20 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Call Supabase auth API to send OTP
-    // Note: Supabase sends "magic links" but we've configured the template to show OTP codes
-    const response = await fetch(`${supabaseUrl}/auth/v1/otp`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': supabaseKey,
-        'Authorization': `Bearer ${supabaseKey}`
-      },
-      body: JSON.stringify({
-        email,
-        create_user: true
-      })
+    const supabase = createClient(supabaseUrl, supabaseKey)
+
+    // Use signInWithOtp - now all templates show OTP codes
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        shouldCreateUser: true,
+        // Don't set emailRedirectTo to ensure OTP is used
+      }
     })
 
-    const result = await response.json()
-
-    if (!response.ok) {
-      return new Response(JSON.stringify({ error: result.error_description || result.msg || 'Failed to send OTP' }), {
-        status: response.status,
+    if (error) {
+      return new Response(JSON.stringify({ error: error.message || 'Failed to send OTP' }), {
+        status: 400,
         headers: { 'Content-Type': 'application/json' }
       })
     }

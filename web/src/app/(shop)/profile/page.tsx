@@ -1,13 +1,13 @@
-import { useTranslations } from "next-intl";
-import AuthWidget from "@/components/AuthWidget";
+import { Suspense } from "react";
+import ProfileClient from "./page.client";
 
 export default function ProfilePage() {
-  const t = useTranslations();
   return (
-    <div className="flex flex-col gap-3">
-      <h2 className="text-lg font-semibold">{t("profile.title")}</h2>
-      <AuthWidget />
-      <div className="bg-white rounded-lg p-3">Orders • Groups • Settings</div>
+    <div className="p-4">
+      <h1 className="text-xl font-semibold mb-4">Profile</h1>
+      <Suspense fallback={<div>Loading profile...</div>}>
+        <ProfileClient />
+      </Suspense>
     </div>
   );
 }

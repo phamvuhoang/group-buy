@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useRealtimeGroups } from "@/hooks/useRealtimeGroup";
 import { Button } from "@/components/ui/button";
-import { useTranslations } from "next-intl";
 
 import type { Group } from "@/lib/types";
 
@@ -12,11 +12,11 @@ interface ProductClientProps {
 }
 
 export default function ProductClient({ productId, showSinglePurchase = false }: ProductClientProps) {
-  const t = useTranslations();
+  const router = useRouter();
   const { groups } = useRealtimeGroups();
   const [isJoining, setIsJoining] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
-  const [isBuying, setIsBuying] = useState(false);
+
 
   const active = groups.find((g: Group) => g.product_id === productId && g.status === "open");
 
@@ -30,7 +30,11 @@ export default function ProductClient({ productId, showSinglePurchase = false }:
       const json = await res.json();
 
       if (!res.ok) {
-        alert(json.error || "Failed to join group");
+        if (res.status === 401) {
+          alert("Please sign in to join a group. You can sign in from the profile page.");
+        } else {
+          alert(json.error || "Failed to join group");
+        }
       }
       // Success - realtime will update the actual count
     } catch {
@@ -56,7 +60,11 @@ export default function ProductClient({ productId, showSinglePurchase = false }:
       const json = await res.json();
 
       if (!res.ok) {
-        alert(json.error || "Failed to create group");
+        if (res.status === 401) {
+          alert("Please sign in to create a group. You can sign in from the profile page.");
+        } else {
+          alert(json.error || "Failed to create group");
+        }
       }
       // Success - realtime will add the new group
     } catch {
@@ -66,43 +74,10 @@ export default function ProductClient({ productId, showSinglePurchase = false }:
     }
   }
 
-  async function buySingle() {
-    if (isBuying) return;
-
-    setIsBuying(true);
-
-    try {
-      // Get product details for pricing
-      const productRes = await fetch(`/api/products`);
-      const products = await productRes.json();
-      const product = products.find((p: { id: string; price: number }) => p.id === productId);
-
-      if (!product) {
-        alert("Product not found");
-        return;
-      }
-
-      const res = await fetch(`/api/orders`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          product_id: productId,
-          amount: product.price, // Use retail price for single purchase
-          type: "single"
-        }),
-      });
-      const json = await res.json();
-
-      if (!res.ok) {
-        alert(json.error || "Failed to create order");
-      } else {
-        alert(`Order created! Order ID: ${json.order.id}`);
-      }
-    } catch {
-      alert("Network error. Please try again.");
-    } finally {
-      setIsBuying(false);
-    }
+  function buySingle() {
+    // Redirect to checkout for single purchase
+    const checkoutUrl = `/checkout?product_id=${productId}&type=single`;
+    router.push(checkoutUrl);
   }
 
   return (
@@ -131,9 +106,8 @@ export default function ProductClient({ productId, showSinglePurchase = false }:
           className="w-full"
           variant="secondary"
           onClick={buySingle}
-          disabled={isBuying}
         >
-          {isBuying ? "Processing..." : t("product.buySingle")}
+          Buy Single
         </Button>
       )}
     </div>

@@ -1,20 +1,21 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useRealtimeGroup } from "@/hooks/useRealtimeGroup";
 import { useRealtimeParticipants } from "@/hooks/useRealtimeParticipants";
 import GroupProgress from "@/components/GroupProgress";
 import ShareButtons from "@/components/ShareButtons";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useTranslations } from "next-intl";
 
 interface RealtimeGroupProps {
   groupId: string;
   productTitle: string;
+  productId?: string;
 }
 
-export default function RealtimeGroup({ groupId, productTitle }: RealtimeGroupProps) {
-  const t = useTranslations();
+export default function RealtimeGroup({ groupId, productTitle, productId }: RealtimeGroupProps) {
+  const router = useRouter();
   const { group, loading: groupLoading } = useRealtimeGroup(groupId);
   const { participants, loading: participantsLoading } = useRealtimeParticipants(groupId);
   const [isJoining, setIsJoining] = useState(false);
@@ -34,7 +35,11 @@ export default function RealtimeGroup({ groupId, productTitle }: RealtimeGroupPr
       if (!res.ok) {
         // Revert optimistic update on error
         setOptimisticCount(undefined);
-        alert(json.error || "Failed to join group");
+        if (res.status === 401) {
+          alert("Please sign in to join a group. You can sign in from the profile page.");
+        } else {
+          alert(json.error || "Failed to join group");
+        }
       } else {
         // Success - realtime will update the actual count
         setTimeout(() => setOptimisticCount(undefined), 1000);
@@ -45,6 +50,20 @@ export default function RealtimeGroup({ groupId, productTitle }: RealtimeGroupPr
     } finally {
       setIsJoining(false);
     }
+  }
+
+  function buySingle() {
+    if (!group) return;
+    // Redirect to checkout for single purchase
+    const checkoutUrl = `/checkout?product_id=${group.product_id}&type=single`;
+    router.push(checkoutUrl);
+  }
+
+  function buyGroup() {
+    if (!group) return;
+    // Redirect to checkout for group purchase
+    const checkoutUrl = `/checkout?product_id=${group.product_id}&group_id=${group.id}&type=group`;
+    router.push(checkoutUrl);
   }
 
   if (groupLoading) {
@@ -87,13 +106,34 @@ export default function RealtimeGroup({ groupId, productTitle }: RealtimeGroupPr
           optimisticCurrent={optimisticCount}
         />
         
-        <Button 
-          className="mt-3 w-full" 
-          onClick={joinGroup}
-          disabled={isJoining || group.status !== "open"}
-        >
-          {isJoining ? "Joining..." : group.status === "completed" ? "Group Completed" : "Join group"}
-        </Button>
+        <div className="space-y-2">
+          {group.status === "open" && (
+            <Button
+              className="w-full"
+              onClick={joinGroup}
+              disabled={isJoining}
+            >
+              {isJoining ? "Joining..." : "Join group"}
+            </Button>
+          )}
+
+          {group.status === "completed" && (
+            <Button
+              className="w-full"
+              onClick={buyGroup}
+            >
+              Buy at Group Price
+            </Button>
+          )}
+
+          <Button
+            className="w-full"
+            variant="secondary"
+            onClick={buySingle}
+          >
+            Buy Single
+          </Button>
+        </div>
         
         <div className="mt-3 space-y-1">
           <div className="text-xs text-muted-foreground">

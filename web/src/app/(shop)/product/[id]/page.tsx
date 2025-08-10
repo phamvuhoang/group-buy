@@ -35,17 +35,15 @@ export default async function ProductDetail({ params }: { params: Promise<{ id: 
       </Card>
 
       {activeGroup ? (
-        <RealtimeGroup groupId={activeGroup.id} productTitle={product.title} />
+        <RealtimeGroup groupId={activeGroup.id} productTitle={product.title} productId={product.id} />
       ) : (
         <Card>
           <CardContent className="pt-4">
             <span className="text-sm">{t("product.noActiveGroup")}</span>
-            <ProductRealtimeClient productId={product.id} />
+            <ProductRealtimeClient productId={product.id} showSinglePurchase={true} />
           </CardContent>
         </Card>
       )}
-
-      <ProductRealtimeClient productId={product.id} showSinglePurchase={true} />
     </div>
   );
 }

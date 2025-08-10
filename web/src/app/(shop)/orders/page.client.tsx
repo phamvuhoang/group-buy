@@ -9,6 +9,10 @@ type Order = {
   amount: number;
   status: string;
   created_at: string;
+  customer_name?: string;
+  customer_phone?: string;
+  payment_method?: string;
+  order_type?: string;
 };
 
 export default function OrdersClient() {
@@ -86,7 +90,11 @@ export default function OrdersClient() {
             {order.group_id && (
               <div>Group: {order.group_id.slice(-8)}</div>
             )}
-            <div>Status: {order.status}</div>
+            <div>Type: {order.order_type || 'single'}</div>
+            <div>Payment: {order.payment_method || 'bank_transfer'}</div>
+            {order.customer_name && (
+              <div>Customer: {order.customer_name}</div>
+            )}
             <div>Date: {new Date(order.created_at).toLocaleDateString()}</div>
           </div>
           

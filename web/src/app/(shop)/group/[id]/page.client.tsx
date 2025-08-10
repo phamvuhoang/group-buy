@@ -6,7 +6,11 @@ export default function GroupJoinClient({ groupId }: { groupId: string }) {
     const res = await fetch(`/api/groups/${groupId}/join`, { method: "POST" });
     const json = await res.json();
     if (!res.ok) {
-      alert(json.error || "Failed to join group");
+      if (res.status === 401) {
+        alert("Please sign in to join a group. You can sign in from the profile page.");
+      } else {
+        alert(json.error || "Failed to join group");
+      }
     }
   }
   return (

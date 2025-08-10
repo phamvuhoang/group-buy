@@ -1,11 +1,13 @@
 import { NextRequest } from "next/server";
-import { supabase } from "@/lib/supabaseClient";
+import { createSupabaseServerClient } from "@/lib/supabaseServer";
 
 export async function GET() {
+  // Create server-side Supabase client
+  const supabase = await createSupabaseServerClient();
+
   // Get orders for authenticated user
-  const { data: sess, error: sessErr } = await supabase.auth.getSession();
-  if (sessErr) return new Response(JSON.stringify({ error: sessErr.message }), { status: 500 });
-  const user = sess.session?.user;
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) return new Response(JSON.stringify({ error: userError.message }), { status: 500 });
   if (!user) return new Response(JSON.stringify({ error: "Not authenticated" }), { status: 401 });
 
   try {
@@ -24,12 +26,14 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const { product_id, group_id, amount, type } = await req.json();
+  const { product_id, group_id, amount, type, customer_info, payment_method } = await req.json();
+
+  // Create server-side Supabase client
+  const supabase = await createSupabaseServerClient();
 
   // Ensure signed-in user
-  const { data: sess, error: sessErr } = await supabase.auth.getSession();
-  if (sessErr) return new Response(JSON.stringify({ error: sessErr.message }), { status: 500 });
-  const user = sess.session?.user;
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) return new Response(JSON.stringify({ error: userError.message }), { status: 500 });
   if (!user) return new Response(JSON.stringify({ error: "Not authenticated" }), { status: 401 });
 
   try {
@@ -42,7 +46,13 @@ export async function POST(req: NextRequest) {
         product_id,
         group_id: group_id || null,
         amount,
-        status: "pending"
+        status: "pending",
+        customer_name: customer_info?.name || null,
+        customer_phone: customer_info?.phone || null,
+        customer_address: customer_info?.address || null,
+        order_notes: customer_info?.notes || null,
+        payment_method: payment_method || 'bank_transfer',
+        order_type: type || 'single'
       })
       .select()
       .single();
