@@ -1,10 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
+import { NextRequest } from "next/server";
 
-export async function POST(req: Request) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    console.log("Group create API called");
-    const { product_id, required_count, expires_at } = await req.json();
-    console.log("Request data:", { product_id, required_count, expires_at });
+    console.log("Order status update API called");
+    const { id: orderId } = await params;
+    const { status } = await req.json();
+    console.log("Request data:", { orderId, status });
 
     // Get the authorization header
     const authHeader = req.headers.get('authorization');
@@ -38,34 +40,45 @@ export async function POST(req: Request) {
       return Response.json({ error: "Invalid authentication" }, { status: 401 });
     }
 
-    // Create group with authenticated user
-    console.log("Creating group for user:", user.id);
+  // Validate status
+  const validStatuses = ["pending", "paid", "shipped", "delivered", "cancelled"];
+  if (!validStatuses.includes(status)) {
+    return Response.json({ error: "Invalid status" }, { status: 400 });
+  }
+
+  try {
+    // Update order status
     const { data, error } = await supabase
-      .from("groups")
-      .insert({
-        id: crypto.randomUUID(),
-        product_id,
-        leader_id: user.id,
-        required_count,
-        expires_at,
-        status: "open",
-        current_count: 0,
-        created_at: new Date().toISOString()
+      .from("orders")
+      .update({ 
+        status,
+        updated_at: new Date().toISOString()
       })
+      .eq("id", orderId)
       .select()
       .single();
 
     if (error) {
       console.error("Database error:", error);
-      return Response.json({ error: error.message }, { status: 400 });
+      return Response.json({ error: "Failed to update order status" }, { status: 500 });
     }
 
-    console.log("Group created successfully:", data);
-    return Response.json({ group: data }, { status: 200 });
+    if (!data) {
+      return Response.json({ error: "Order not found" }, { status: 404 });
+    }
+
+    return Response.json({ 
+      message: "Order status updated successfully",
+      order: data 
+    });
 
   } catch (error) {
-    console.error("Group creation API error:", error);
+    console.error("Update order status error:", error);
+    return Response.json({ error: "Internal server error" }, { status: 500 });
+  }
+
+  } catch (error) {
+    console.error("Order status API error:", error);
     return Response.json({ error: "Internal server error" }, { status: 500 });
   }
 }
-

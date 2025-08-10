@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useRealtimeGroup } from "@/hooks/useRealtimeGroup";
 import { useRealtimeParticipants } from "@/hooks/useRealtimeParticipants";
 import GroupProgress from "@/components/GroupProgress";
@@ -16,6 +17,7 @@ interface RealtimeGroupProps {
 
 export default function RealtimeGroup({ groupId, productTitle, productId }: RealtimeGroupProps) {
   const router = useRouter();
+  const t = useTranslations();
   const { group, loading: groupLoading } = useRealtimeGroup(groupId);
   const { participants, loading: participantsLoading } = useRealtimeParticipants(groupId);
   const [isJoining, setIsJoining] = useState(false);
@@ -23,15 +25,16 @@ export default function RealtimeGroup({ groupId, productTitle, productId }: Real
 
   async function joinGroup() {
     if (!group || isJoining) return;
-    
+
     setIsJoining(true);
     // Optimistic update
     setOptimisticCount(group.current_count + 1);
 
     try {
-      const res = await fetch(`/api/groups/${group.id}/join`, { method: "POST" });
+      const { authenticatedFetch } = await import("@/lib/apiClient");
+      const res = await authenticatedFetch(`/api/groups/${group.id}/join`, { method: "POST" });
       const json = await res.json();
-      
+
       if (!res.ok) {
         // Revert optimistic update on error
         setOptimisticCount(undefined);
@@ -44,9 +47,13 @@ export default function RealtimeGroup({ groupId, productTitle, productId }: Real
         // Success - realtime will update the actual count
         setTimeout(() => setOptimisticCount(undefined), 1000);
       }
-    } catch {
+    } catch (error) {
       setOptimisticCount(undefined);
-      alert("Network error. Please try again.");
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert("Network error. Please try again.");
+      }
     } finally {
       setIsJoining(false);
     }
@@ -83,7 +90,7 @@ export default function RealtimeGroup({ groupId, productTitle, productId }: Real
     return (
       <Card>
         <CardContent className="pt-4">
-          <span className="text-sm text-muted-foreground">Group not found</span>
+          <span className="text-sm text-muted-foreground">{t("product.groupNotFound")}</span>
         </CardContent>
       </Card>
     );
@@ -93,9 +100,9 @@ export default function RealtimeGroup({ groupId, productTitle, productId }: Real
     <Card>
       <CardHeader className="flex-row items-center justify-between border-b pb-3">
         <CardTitle className="text-sm">{t("product.activeGroup")}</CardTitle>
-        <ShareButtons 
-          url={`${window.location.origin}/group/${group.id}`} 
-          title={`Join group for ${productTitle}`} 
+        <ShareButtons
+          url={`${window.location.origin}/group/${group.id}`}
+          title={`${t("product.joinGroupFor")} ${productTitle}`}
         />
       </CardHeader>
       <CardContent className="pt-4">
@@ -113,7 +120,7 @@ export default function RealtimeGroup({ groupId, productTitle, productId }: Real
               onClick={joinGroup}
               disabled={isJoining}
             >
-              {isJoining ? "Joining..." : "Join group"}
+              {isJoining ? t("product.joining") : t("product.join")}
             </Button>
           )}
 
@@ -122,7 +129,7 @@ export default function RealtimeGroup({ groupId, productTitle, productId }: Real
               className="w-full"
               onClick={buyGroup}
             >
-              Buy at Group Price
+              {t("product.buyAtGroupPrice")}
             </Button>
           )}
 
@@ -131,19 +138,19 @@ export default function RealtimeGroup({ groupId, productTitle, productId }: Real
             variant="secondary"
             onClick={buySingle}
           >
-            Buy Single
+            {t("product.buySingle")}
           </Button>
         </div>
         
         <div className="mt-3 space-y-1">
           <div className="text-xs text-muted-foreground">
-            Participants: {participantsLoading ? "..." : participants.length}
+            {t("product.participants")}: {participantsLoading ? "..." : participants.length}
           </div>
           <div className="text-xs text-muted-foreground">
-            Group ID: {group.id}
+            {t("product.groupId")}: {group.id}
           </div>
           <div className="text-xs text-muted-foreground">
-            Status: {group.status}
+            {t("product.status")}: {group.status}
           </div>
         </div>
       </CardContent>

@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { useRealtimeGroup } from "@/hooks/useRealtimeGroup";
 import { useRealtimeParticipants } from "@/hooks/useRealtimeParticipants";
 import GroupProgress from "@/components/GroupProgress";
@@ -12,6 +13,7 @@ interface RealtimeGroupDetailsProps {
 }
 
 export default function RealtimeGroupDetails({ groupId, productTitle }: RealtimeGroupDetailsProps) {
+  const t = useTranslations();
   const { group, loading: groupLoading } = useRealtimeGroup(groupId);
   const { participants, loading: participantsLoading } = useRealtimeParticipants(groupId);
   const [isJoining, setIsJoining] = useState(false);
@@ -19,15 +21,16 @@ export default function RealtimeGroupDetails({ groupId, productTitle }: Realtime
 
   async function joinGroup() {
     if (!group || isJoining) return;
-    
+
     setIsJoining(true);
     // Optimistic update
     setOptimisticCount(group.current_count + 1);
 
     try {
-      const res = await fetch(`/api/groups/${group.id}/join`, { method: "POST" });
+      const { authenticatedFetch } = await import("@/lib/apiClient");
+      const res = await authenticatedFetch(`/api/groups/${group.id}/join`, { method: "POST" });
       const json = await res.json();
-      
+
       if (!res.ok) {
         // Revert optimistic update on error
         setOptimisticCount(undefined);
@@ -36,9 +39,13 @@ export default function RealtimeGroupDetails({ groupId, productTitle }: Realtime
         // Success - realtime will update the actual count
         setTimeout(() => setOptimisticCount(undefined), 1000);
       }
-    } catch {
+    } catch (error) {
       setOptimisticCount(undefined);
-      alert("Network error. Please try again.");
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert("Network error. Please try again.");
+      }
     } finally {
       setIsJoining(false);
     }
@@ -69,13 +76,13 @@ export default function RealtimeGroupDetails({ groupId, productTitle }: Realtime
       
       <div className="space-y-2">
         <div className="text-sm text-muted-foreground">
-          Participants: {participantsLoading ? "..." : participants.length}
+          {t("product.participants")}: {participantsLoading ? "..." : participants.length}
         </div>
         <div className="text-sm text-muted-foreground">
-          Status: {group.status}
+          {t("product.status")}: {group.status}
         </div>
         <div className="text-xs text-muted-foreground">
-          Group ID: {group.id}
+          {t("product.groupId")}: {group.id}
         </div>
       </div>
 
@@ -85,12 +92,12 @@ export default function RealtimeGroupDetails({ groupId, productTitle }: Realtime
           onClick={joinGroup}
           disabled={isJoining || group.status !== "open"}
         >
-          {isJoining ? "Joining..." : group.status === "completed" ? "Group Completed" : "Join Group"}
+          {isJoining ? t("product.joining") : group.status === "completed" ? t("product.groupCompleted") : t("product.join")}
         </Button>
         
         <ShareButtons 
           url={`${window.location.origin}/group/${group.id}`} 
-          title={`Join group for ${productTitle}`} 
+          title={`${t("product.joinGroupFor")} ${productTitle}`}
         />
       </div>
 

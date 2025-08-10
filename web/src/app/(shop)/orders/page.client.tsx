@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { formatCurrencyVND } from "@/lib/format";
 
 type Order = {
@@ -16,6 +17,7 @@ type Order = {
 };
 
 export default function OrdersClient() {
+  const t = useTranslations();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -64,9 +66,9 @@ export default function OrdersClient() {
   if (orders.length === 0) {
     return (
       <div className="text-center py-8">
-        <p className="text-muted-foreground text-sm">No orders yet</p>
+        <p className="text-muted-foreground text-sm">{t("orders.noOrders")}</p>
         <p className="text-xs text-muted-foreground mt-1">
-          Your orders will appear here after you make a purchase
+          {t("orders.ordersWillAppear")}
         </p>
       </div>
     );
@@ -98,17 +100,46 @@ export default function OrdersClient() {
             <div>Date: {new Date(order.created_at).toLocaleDateString()}</div>
           </div>
           
-          <div className="mt-2">
+          <div className="mt-2 flex items-center justify-between">
             <span className={`inline-block px-2 py-1 rounded text-xs ${
-              order.status === "pending" 
-                ? "bg-yellow-100 text-yellow-800" 
+              order.status === "pending"
+                ? "bg-yellow-100 text-yellow-800"
                 : order.status === "paid"
                 ? "bg-green-100 text-green-800"
+                : order.status === "shipped"
+                ? "bg-blue-100 text-blue-800"
+                : order.status === "delivered"
+                ? "bg-purple-100 text-purple-800"
                 : "bg-gray-100 text-gray-800"
             }`}>
               {order.status.toUpperCase()}
             </span>
+
+            {order.status === "pending" && order.payment_method === "bank_transfer" && (
+              <button
+                onClick={() => {
+                  alert(`BANK TRANSFER DETAILS:
+Bank: Vietcombank
+Account: 1234567890
+Name: VN GROUP BUY CO LTD
+Amount: ${formatCurrencyVND(order.amount)}
+Reference: ${order.id}
+
+Please transfer the exact amount and include your order ID (${order.id}) in the transfer reference.`);
+                }}
+                className="text-xs text-blue-600 hover:text-blue-800 underline"
+              >
+                Payment Info
+              </button>
+            )}
           </div>
+
+          {order.status === "pending" && order.payment_method === "bank_transfer" && (
+            <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
+              <p className="text-yellow-800 font-medium">⏳ Awaiting Payment</p>
+              <p className="text-yellow-700">Please complete bank transfer to process your order</p>
+            </div>
+          )}
         </div>
       ))}
     </div>

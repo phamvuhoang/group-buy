@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +26,7 @@ interface Group {
 }
 
 export default function CheckoutClient() {
+  const t = useTranslations();
   const searchParams = useSearchParams();
   const router = useRouter();
   
@@ -110,9 +112,9 @@ export default function CheckoutClient() {
         payment_method: paymentMethod
       };
 
-      const res = await fetch("/api/orders", {
+      const { authenticatedFetch } = await import("@/lib/apiClient");
+      const res = await authenticatedFetch("/api/orders", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(orderData)
       });
 
@@ -127,8 +129,21 @@ export default function CheckoutClient() {
         throw new Error(result.error || "Failed to create order");
       }
 
-      // Success
-      alert(`Order created successfully! Order ID: ${result.order.id}\n\nFor bank transfer, please transfer ${formatCurrencyVND(getPrice())} to our account and include your order ID in the reference.`);
+      // Success - show detailed payment instructions
+      if (paymentMethod === "bank_transfer") {
+        alert(`Order created successfully! Order ID: ${result.order.id}
+
+BANK TRANSFER DETAILS:
+Bank: Vietcombank
+Account: 1234567890
+Name: VN GROUP BUY CO LTD
+Amount: ${formatCurrencyVND(getPrice())}
+Reference: ${result.order.id}
+
+Please transfer the exact amount and include your order ID (${result.order.id}) in the transfer reference. Your order will be processed after payment confirmation (within 24 hours).`);
+      } else {
+        alert(`Order created successfully! Order ID: ${result.order.id}`);
+      }
       router.push("/orders");
       
     } catch (error) {
@@ -140,11 +155,11 @@ export default function CheckoutClient() {
   };
 
   if (loading) {
-    return <div className="p-4">Loading checkout...</div>;
+    return <div className="p-4">{t("checkout.loadingCheckout")}</div>;
   }
 
   if (!product) {
-    return <div className="p-4">Product not found</div>;
+    return <div className="p-4">{t("checkout.productNotFound")}</div>;
   }
 
   return (
@@ -152,7 +167,7 @@ export default function CheckoutClient() {
       {/* Order Summary */}
       <Card>
         <CardHeader>
-          <CardTitle>Order Summary</CardTitle>
+          <CardTitle>{t("checkout.orderSummary")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex gap-3">
@@ -166,7 +181,7 @@ export default function CheckoutClient() {
             <div className="flex-1">
               <h3 className="font-medium">{product.title}</h3>
               <p className="text-sm text-muted-foreground">
-                {type === "group" ? "Group Purchase" : "Single Purchase"}
+                {type === "group" ? t("checkout.groupPurchase") : t("checkout.singlePurchase")}
               </p>
               {group && (
                 <p className="text-xs text-muted-foreground">
@@ -184,11 +199,11 @@ export default function CheckoutClient() {
       {/* Customer Information */}
       <Card>
         <CardHeader>
-          <CardTitle>Customer Information</CardTitle>
+          <CardTitle>{t("checkout.customerInfo")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="name">Full Name *</Label>
+            <Label htmlFor="name">{t("checkout.name")} *</Label>
             <Input
               id="name"
               value={customerInfo.name}
@@ -197,7 +212,7 @@ export default function CheckoutClient() {
             />
           </div>
           <div>
-            <Label htmlFor="phone">Phone Number *</Label>
+            <Label htmlFor="phone">{t("checkout.phone")} *</Label>
             <Input
               id="phone"
               type="tel"
@@ -207,7 +222,7 @@ export default function CheckoutClient() {
             />
           </div>
           <div>
-            <Label htmlFor="address">Delivery Address</Label>
+            <Label htmlFor="address">{t("checkout.address")}</Label>
             <Input
               id="address"
               value={customerInfo.address}
@@ -216,7 +231,7 @@ export default function CheckoutClient() {
             />
           </div>
           <div>
-            <Label htmlFor="notes">Order Notes</Label>
+            <Label htmlFor="notes">{t("checkout.notes")}</Label>
             <Input
               id="notes"
               value={customerInfo.notes}
@@ -230,13 +245,13 @@ export default function CheckoutClient() {
       {/* Payment Method */}
       <Card>
         <CardHeader>
-          <CardTitle>Payment Method</CardTitle>
+          <CardTitle>{t("checkout.paymentMethod")}</CardTitle>
         </CardHeader>
         <CardContent>
           <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="bank_transfer" id="bank_transfer" />
-              <Label htmlFor="bank_transfer">Bank Transfer</Label>
+              <Label htmlFor="bank_transfer">{t("checkout.bankTransfer")}</Label>
             </div>
             <div className="flex items-center space-x-2 opacity-50">
               <RadioGroupItem value="momo" id="momo" disabled />
@@ -249,11 +264,33 @@ export default function CheckoutClient() {
           </RadioGroup>
           
           {paymentMethod === "bank_transfer" && (
-            <div className="mt-4 p-3 bg-muted rounded text-sm">
-              <p className="font-medium">Bank Transfer Instructions:</p>
-              <p>1. Transfer the exact amount to our bank account</p>
-              <p>2. Include your order ID in the transfer reference</p>
-              <p>3. We'll confirm your payment within 24 hours</p>
+            <div className="mt-4 p-4 bg-muted rounded">
+              <p className="font-medium mb-3">{t("checkout.bankTransferDetails")}:</p>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="font-medium">Bank:</span>
+                  <span>Vietcombank</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-medium">Account Number:</span>
+                  <span className="font-mono">1234567890</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-medium">Account Name:</span>
+                  <span>VN GROUP BUY CO LTD</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-medium">Amount:</span>
+                  <span className="font-semibold text-primary">{formatCurrencyVND(getPrice())}</span>
+                </div>
+              </div>
+              <div className="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
+                <p className="font-medium text-yellow-800">Important:</p>
+                <p className="text-yellow-700">• Transfer the exact amount shown above</p>
+                <p className="text-yellow-700">• Include your order ID in the transfer reference</p>
+                <p className="text-yellow-700">• Payment will be confirmed within 24 hours</p>
+                <p className="text-yellow-700">• Order will be processed after payment confirmation</p>
+              </div>
             </div>
           )}
         </CardContent>
@@ -266,7 +303,7 @@ export default function CheckoutClient() {
         size="lg"
         disabled={processing}
       >
-        {processing ? "Processing..." : `Place Order - ${formatCurrencyVND(getPrice())}`}
+        {processing ? t("checkout.processing") : `${t("checkout.placeOrder")} - ${formatCurrencyVND(getPrice())}`}
       </Button>
     </form>
   );

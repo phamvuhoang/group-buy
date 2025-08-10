@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
+import { createClient } from '@supabase/supabase-js';
 
 export async function GET() {
   // Create server-side Supabase client
@@ -26,15 +27,42 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const { product_id, group_id, amount, type, customer_info, payment_method } = await req.json();
+  try {
+    console.log("Orders create API called");
+    const { product_id, group_id, amount, type, customer_info, payment_method } = await req.json();
+    console.log("Request data:", { product_id, group_id, amount, type, payment_method });
 
-  // Create server-side Supabase client
-  const supabase = await createSupabaseServerClient();
+    // Get the authorization header
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      console.log("No authorization header found");
+      return Response.json({ error: "Authentication required" }, { status: 401 });
+    }
 
-  // Ensure signed-in user
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError) return new Response(JSON.stringify({ error: userError.message }), { status: 500 });
-  if (!user) return new Response(JSON.stringify({ error: "Not authenticated" }), { status: 401 });
+    const token = authHeader.split(' ')[1];
+    console.log("Token received, length:", token.length);
+
+    // Create Supabase client with the user's JWT token
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        global: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      }
+    );
+
+    // Verify the user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    console.log("User verification:", { user: !!user, error: userError });
+
+    if (userError || !user) {
+      console.log("User verification failed:", userError);
+      return Response.json({ error: "Invalid authentication" }, { status: 401 });
+    }
 
   try {
     // Create order
@@ -67,6 +95,11 @@ export async function POST(req: NextRequest) {
   } catch (e) {
     const err = e as Error;
     return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+  }
+
+  } catch (error) {
+    console.error("Orders API error:", error);
+    return Response.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 

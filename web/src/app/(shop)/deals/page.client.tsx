@@ -1,4 +1,5 @@
 "use client";
+import { useTranslations } from "next-intl";
 import ProductCard from "@/components/ProductCard";
 import { useProducts } from "@/hooks/useProducts";
 import { useRealtimeGroups } from "@/hooks/useRealtimeGroup";
@@ -7,11 +8,12 @@ import { useCart } from "@/store/useCart";
 import type { Product } from "@/lib/types";
 
 export default function DealsClient() {
+  const t = useTranslations();
   const { products, isLoading: productsLoading } = useProducts();
   const { groups, loading: groupsLoading } = useRealtimeGroups();
   const add = useCart((s) => s.add);
 
-  if (productsLoading) return <div>Loading products…</div>;
+  if (productsLoading) return <div>{t("deals.loadingProducts")}</div>;
 
   // Enhance products with active group count
   const enhancedProducts = products.map(product => ({
@@ -26,7 +28,7 @@ export default function DealsClient() {
       ))}
       {groupsLoading && (
         <div className="text-xs text-muted-foreground text-center py-2">
-          Updating group counts...
+          {t("deals.updatingGroupCounts")}
         </div>
       )}
     </section>

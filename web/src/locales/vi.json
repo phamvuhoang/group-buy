@@ -21,14 +21,70 @@
     "groupCompleted": "Nhóm đã đủ",
     "participants": "Thành viên",
     "status": "Trạng thái",
-    "groupId": "Mã nhóm"
+    "groupId": "Mã nhóm",
+    "groupNotFound": "Không tìm thấy nhóm",
+    "buyAtGroupPrice": "Mua với giá nhóm",
+    "joinGroupFor": "Tham gia nhóm cho",
+    "groupFor": "Nhóm cho"
   },
   "profile": {
     "title": "Hồ sơ"
   },
   "checkout": {
     "title": "Thanh toán",
-    "payNow": "Thanh toán ngay"
+    "payNow": "Thanh toán ngay",
+    "orderSummary": "Tóm tắt đơn hàng",
+    "groupPurchase": "Mua nhóm",
+    "singlePurchase": "Mua lẻ",
+    "processing": "Đang xử lý...",
+    "placeOrder": "Đặt hàng",
+    "loadingCheckout": "Đang tải thanh toán...",
+    "productNotFound": "Không tìm thấy sản phẩm",
+    "customerInfo": "Thông tin khách hàng",
+    "name": "Họ và tên",
+    "phone": "Số điện thoại",
+    "address": "Địa chỉ",
+    "notes": "Ghi chú (tùy chọn)",
+    "paymentMethod": "Phương thức thanh toán",
+    "bankTransfer": "Chuyển khoản ngân hàng",
+    "cod": "Thanh toán khi nhận hàng",
+    "bankTransferDetails": "Chi tiết chuyển khoản",
+    "bankTransferNote": "Vui lòng chuyển đúng số tiền và ghi mã đơn hàng trong nội dung chuyển khoản. Thanh toán sẽ được xác nhận trong vòng 24 giờ.",
+    "important": "Quan trọng:",
+    "transferExactAmount": "Chuyển đúng số tiền hiển thị ở trên",
+    "includeOrderId": "Ghi mã đơn hàng trong nội dung chuyển khoản",
+    "paymentConfirmed": "Thanh toán sẽ được xác nhận trong vòng 24 giờ",
+    "orderProcessed": "Đơn hàng sẽ được xử lý sau khi xác nhận thanh toán"
+  },
+  "layout": {
+    "appTitle": "Mua Chung VN",
+    "menu": "Menu",
+    "shopping": "Mua sắm",
+    "home": "Trang chủ",
+    "deals": "Ưu đãi",
+    "orders": "Đơn hàng",
+    "profile": "Hồ sơ",
+    "account": "Tài khoản",
+    "business": "Kinh doanh",
+    "merchantDashboard": "Bảng điều khiển người bán",
+    "adminDashboard": "Bảng điều khiển quản trị",
+    "supportDashboard": "Bảng điều khiển hỗ trợ",
+    "version": "Mua Chung VN v1.0"
+  },
+  "orders": {
+    "noOrders": "Chưa có đơn hàng",
+    "ordersWillAppear": "Đơn hàng của bạn sẽ hiển thị ở đây sau khi mua hàng"
+  },
+  "deals": {
+    "loadingProducts": "Đang tải sản phẩm…",
+    "updatingGroupCounts": "Đang cập nhật số lượng nhóm..."
+  },
+  "group": {
+    "groupNotFound": "Không tìm thấy nhóm"
+  },
+  "common": {
+    "loading": "Đang tải...",
+    "notFound": "Không tìm thấy"
   }
 }
 

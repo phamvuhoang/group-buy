@@ -35,9 +35,12 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Optional: Add logging for debugging
+  // Add logging for debugging auth issues
   if (request.nextUrl.pathname.startsWith('/api/')) {
     console.log(`API request to ${request.nextUrl.pathname}, user: ${user?.email || 'none'}`)
+    if (!user && (request.nextUrl.pathname.includes('/create') || request.nextUrl.pathname.includes('/join') || request.nextUrl.pathname.includes('/orders'))) {
+      console.log('Auth required endpoint accessed without user, cookies:', request.cookies.getAll().map(c => c.name))
+    }
   }
 
   return supabaseResponse

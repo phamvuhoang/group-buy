@@ -15,20 +15,76 @@
     "noActiveGroup": "No active groups. Be the first!",
     "join": "Join group",
     "create": "Create group",
-    "buySingle": "Buy single",
+    "buySingle": "Buy Single",
     "joining": "Joining...",
     "creating": "Creating...",
     "groupCompleted": "Group Completed",
     "participants": "Participants",
     "status": "Status",
-    "groupId": "Group ID"
+    "groupId": "Group ID",
+    "groupNotFound": "Group not found",
+    "buyAtGroupPrice": "Buy at Group Price",
+    "joinGroupFor": "Join group for",
+    "groupFor": "Group for"
   },
   "profile": {
     "title": "Profile"
   },
   "checkout": {
     "title": "Checkout",
-    "payNow": "Pay now"
+    "payNow": "Pay now",
+    "orderSummary": "Order Summary",
+    "groupPurchase": "Group Purchase",
+    "singlePurchase": "Single Purchase",
+    "processing": "Processing...",
+    "placeOrder": "Place Order",
+    "loadingCheckout": "Loading checkout...",
+    "productNotFound": "Product not found",
+    "customerInfo": "Customer Information",
+    "name": "Full Name",
+    "phone": "Phone Number",
+    "address": "Address",
+    "notes": "Notes (optional)",
+    "paymentMethod": "Payment Method",
+    "bankTransfer": "Bank Transfer",
+    "cod": "Cash on Delivery",
+    "bankTransferDetails": "Bank Transfer Details",
+    "bankTransferNote": "Please transfer the exact amount and include your order ID in the transfer reference. Payment will be confirmed within 24 hours.",
+    "important": "Important:",
+    "transferExactAmount": "Transfer the exact amount shown above",
+    "includeOrderId": "Include your order ID in the transfer reference",
+    "paymentConfirmed": "Payment will be confirmed within 24 hours",
+    "orderProcessed": "Order will be processed after payment confirmation"
+  },
+  "layout": {
+    "appTitle": "VN Group Buy",
+    "menu": "Menu",
+    "shopping": "Shopping",
+    "home": "Home",
+    "deals": "Deals",
+    "orders": "Orders",
+    "profile": "Profile",
+    "account": "Account",
+    "business": "Business",
+    "merchantDashboard": "Merchant Dashboard",
+    "adminDashboard": "Admin Dashboard",
+    "supportDashboard": "Support Dashboard",
+    "version": "VN Group Buy v1.0"
+  },
+  "orders": {
+    "noOrders": "No orders yet",
+    "ordersWillAppear": "Your orders will appear here after you make a purchase"
+  },
+  "deals": {
+    "loadingProducts": "Loading products…",
+    "updatingGroupCounts": "Updating group counts..."
+  },
+  "group": {
+    "groupNotFound": "Group not found"
+  },
+  "common": {
+    "loading": "Loading...",
+    "notFound": "Not found"
   }
 }
 
